@@ -39,4 +39,16 @@ public class UserController {
         return new ResponseEntity<>(userService.save(user), HttpStatus.CREATED);
     }
 
+    @DeleteMapping(path="/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id){
+        log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + "delete");
+        return new ResponseEntity<String>(userService.delete(id), HttpStatus.I_AM_A_TEAPOT);
+    }
+
+    @PutMapping
+    public ResponseEntity<String> replace(@RequestBody User user){
+        log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + "delete");
+        return new ResponseEntity<String>(userService.replace(user), HttpStatus.I_AM_A_TEAPOT);
+    }
+
 }

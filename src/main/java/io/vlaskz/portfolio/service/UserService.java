@@ -43,4 +43,13 @@ public class UserService {
         return user;
     }
 
+    public String delete(Long id) {
+        userList.remove(findUserById(id));
+        return "User with id " + id + " was dropped.";
+    }
+
+    public String replace(User user) {
+        delete(user.getId());
+        userList.add(user);
+    }
 }
