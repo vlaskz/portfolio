@@ -51,5 +51,6 @@ public class UserService {
     public String replace(User user) {
         delete(user.getId());
         userList.add(user);
+        return "User id #" + user.getId() + " now belongs to " + user.getName() + ".";
     }
 }
