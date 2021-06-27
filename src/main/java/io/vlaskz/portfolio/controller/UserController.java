@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -35,9 +37,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findByName(name));
     }
 
-
+    @Transactional()
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody UserPostRequestBody userPostRequestBody) {
+    public ResponseEntity<User> save(@RequestBody @Valid UserPostRequestBody userPostRequestBody) {
         return new ResponseEntity<>(userService.save(userPostRequestBody), HttpStatus.CREATED);
     }
 

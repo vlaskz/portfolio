@@ -1,9 +1,10 @@
-# portfolio
-My API Portfolio for Hiring and things.
+# Portfolio
 
-## This is part of my efforts to show to community and recruiters I know what I'm doing.
+#### This is a sample of my knowledge about Java API with Spring Boot.
 
 I'm using:
+ 
+ * Spring Validation
  * Spring Boot
  * Spring Data
  * Spring JPA
