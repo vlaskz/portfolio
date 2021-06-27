@@ -1,5 +1,6 @@
 package io.vlaskz.portfolio.service;
 
+import io.vlaskz.portfolio.exception.BadRequestException;
 import io.vlaskz.portfolio.mapper.UserMapper;
 import io.vlaskz.portfolio.model.User;
 import io.vlaskz.portfolio.repository.UserRepository;
@@ -22,9 +23,14 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<User> findByName(String name)
+    {
+        return userRepository.findByName(name);
+    }
+
     public User findByIdOrThrowBadRequestException(long id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new ResponseStatusException((HttpStatus.BAD_REQUEST), "User not found"));
+                .orElseThrow(()-> new BadRequestException("User not found"));
     }
 
     public User save(UserPostRequestBody userPostRequestBody) {
@@ -38,14 +44,9 @@ public class UserService {
 
     public String replace(UserPutRequestBody userPutRequestBody) {
 
-        findByIdOrThrowBadRequestException(userPutRequestBody.getId());
-
-        User user = User.builder()
-                .id(userPutRequestBody.getId())
-                .name(userPutRequestBody.getName())
-                .email(userPutRequestBody.getEmail())
-                .build();
-
+        User savedUser = findByIdOrThrowBadRequestException(userPutRequestBody.getId());
+        User user = UserMapper.INSTANCE.toUser(userPutRequestBody);
+        user.setId(savedUser.getId());
         userRepository.save(user);
         return "User id #" + user.getId() + " now belongs to " + user.getName() + ".";
     }
