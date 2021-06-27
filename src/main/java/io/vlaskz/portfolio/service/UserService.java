@@ -1,5 +1,6 @@
 package io.vlaskz.portfolio.service;
 
+import io.vlaskz.portfolio.mapper.UserMapper;
 import io.vlaskz.portfolio.model.User;
 import io.vlaskz.portfolio.repository.UserRepository;
 import io.vlaskz.portfolio.request.UserPostRequestBody;
@@ -27,8 +28,7 @@ public class UserService {
     }
 
     public User save(UserPostRequestBody userPostRequestBody) {
-       User user =  User.builder().name(userPostRequestBody.getName()).email(userPostRequestBody.getEmail()).build();
-        return userRepository.save(user);
+        return userRepository.save(UserMapper.INSTANCE.toUser(userPostRequestBody));
     }
 
     public String delete(Long id) {
