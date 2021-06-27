@@ -1,6 +1,8 @@
 package io.vlaskz.portfolio.controller;
 
 import io.vlaskz.portfolio.model.User;
+import io.vlaskz.portfolio.request.UserPostRequestBody;
+import io.vlaskz.portfolio.request.UserPutRequestBody;
 import io.vlaskz.portfolio.service.UserService;
 import io.vlaskz.portfolio.util.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +26,19 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> list() {
         log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + " list");
-        return new ResponseEntity<>(userService.list(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
         log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + " findUserById");
-        return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findByIdOrThrowBadRequestException(id), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user){
+    public ResponseEntity<User> save(@RequestBody UserPostRequestBody userPostRequestBody){
         log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + "save");
-        return new ResponseEntity<>(userService.save(user), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.save(userPostRequestBody), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path="/{id}")
@@ -46,9 +48,9 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<String> replace(@RequestBody User user){
+    public ResponseEntity<String> replace(@RequestBody UserPutRequestBody userPutRequestBody){
         log.info(dateUtil.convertLocalDateTimeToServerFormal(LocalDateTime.now()) + "delete");
-        return new ResponseEntity<String>(userService.replace(user), HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<String>(userService.replace(userPutRequestBody), HttpStatus.I_AM_A_TEAPOT);
     }
 
 }

@@ -1,56 +1,52 @@
 package io.vlaskz.portfolio.service;
 
 import io.vlaskz.portfolio.model.User;
+import io.vlaskz.portfolio.repository.UserRepository;
+import io.vlaskz.portfolio.request.UserPostRequestBody;
+import io.vlaskz.portfolio.request.UserPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private static List<User> userList;
-    static{
+    private final UserRepository userRepository;
 
-        userList = new ArrayList<>(List.of(
-                new User(1L, "Isaias Velasquez", "vlaskz@icloud.com"),
-                new User(2L, "Doritos Velasquez", "doritos@icloud.com")));
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
-
-    public List<User> list() {
-        return userList;
+    public User findByIdOrThrowBadRequestException(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException((HttpStatus.BAD_REQUEST), "User not found"));
     }
 
-    public User findUserById(Long id) {
-        return userList
-                .stream()
-                .filter(User -> Objects.equals(User.getId(), id))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
-    }
-
-    public User save(User user) {
-
-        user.setId(ThreadLocalRandom.current().nextLong());
-        userList.add(user);
-        return user;
+    public User save(UserPostRequestBody userPostRequestBody) {
+       User user =  User.builder().name(userPostRequestBody.getName()).email(userPostRequestBody.getEmail()).build();
+        return userRepository.save(user);
     }
 
     public String delete(Long id) {
-        userList.remove(findUserById(id));
+        userRepository.delete(findByIdOrThrowBadRequestException(id));
         return "User with id " + id + " was dropped.";
     }
 
-    public String replace(User user) {
-        delete(user.getId());
-        userList.add(user);
+    public String replace(UserPutRequestBody userPutRequestBody) {
+
+        findByIdOrThrowBadRequestException(userPutRequestBody.getId());
+
+        User user = User.builder()
+                .id(userPutRequestBody.getId())
+                .name(userPutRequestBody.getName())
+                .email(userPutRequestBody.getEmail())
+                .build();
+
+        userRepository.save(user);
         return "User id #" + user.getId() + " now belongs to " + user.getName() + ".";
     }
 }

@@ -2,12 +2,9 @@ package io.vlaskz.portfolio.repository;
 
 
 import io.vlaskz.portfolio.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+public interface UserRepository extends JpaRepository<User, Long> {
 
-public interface UserRepository {
-
-    List<User> list();
-    User findUserById(Long id);
 
 }
