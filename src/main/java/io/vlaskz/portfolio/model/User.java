@@ -1,6 +1,7 @@
 package io.vlaskz.portfolio.model;
 
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,4 +20,5 @@ public class User {
     private Long id;
     private String name;
     private String email;
+
 }
