@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.web.util.WebUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,22 +36,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationExceptionDetails> handlerMethodArgumentNotValidException(
-            MethodArgumentNotValidException exception) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatus status, WebRequest request) {
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
         String fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(","));
         String fieldsMessages = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(","));
         return new ResponseEntity<>(
                 ValidationExceptionDetails.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .title("Validation not passed.")
-                .details(exception.getMessage())
-                .developerMessage(exception.getClass().getName())
-                .fields(fields)
-                .fieldsMessage(fieldsMessages)
-                .build(),HttpStatus.BAD_REQUEST);
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .title("Validation not passed.")
+                        .details(exception.getMessage())
+                        .developerMessage(exception.getClass().getName())
+                        .fields(fields)
+                        .fieldsMessage(fieldsMessages)
+                        .build(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
