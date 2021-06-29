@@ -6,6 +6,8 @@ import io.vlaskz.portfolio.request.UserPutRequestBody;
 import io.vlaskz.portfolio.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +25,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> list() {
-        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
+    public ResponseEntity<Page<User>> list(Pageable pageable) {
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @GetMapping(path = "/{id}")
@@ -45,12 +47,12 @@ public class UserController {
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
-        return new ResponseEntity<String>(userService.delete(id), HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<>(userService.delete(id), HttpStatus.I_AM_A_TEAPOT);
     }
 
     @PutMapping
     public ResponseEntity<String> replace(@RequestBody UserPutRequestBody userPutRequestBody) {
-        return new ResponseEntity<String>(userService.replace(userPutRequestBody), HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<>(userService.replace(userPutRequestBody), HttpStatus.I_AM_A_TEAPOT);
     }
 
 }

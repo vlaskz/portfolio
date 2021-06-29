@@ -7,6 +7,8 @@ import io.vlaskz.portfolio.repository.UserRepository;
 import io.vlaskz.portfolio.request.UserPostRequestBody;
 import io.vlaskz.portfolio.request.UserPutRequestBody;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,8 +21,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public List<User> findByName(String name)

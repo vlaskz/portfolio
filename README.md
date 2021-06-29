@@ -3,6 +3,7 @@
 ### This is a sample of my knowledge about Java API with Spring Boot.
 
 I'm using:
+ * Pagination
  * Custom Exception Handling
  * Spring Validation
  * Spring Boot
