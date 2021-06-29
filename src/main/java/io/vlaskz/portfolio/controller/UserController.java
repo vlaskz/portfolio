@@ -29,6 +29,11 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll(pageable));
     }
 
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<User>> list() {
+        return ResponseEntity.ok(userService.listAll());
+    }
+
     @GetMapping(path = "/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findByIdOrThrowBadRequestException(id));

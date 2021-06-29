@@ -9,9 +9,7 @@ import io.vlaskz.portfolio.request.UserPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,14 +23,17 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
-    public List<User> findByName(String name)
-    {
+    public List<User> listAll() {
+        return userRepository.findAll();
+    }
+
+    public List<User> findByName(String name) {
         return userRepository.findByName(name);
     }
 
     public User findByIdOrThrowBadRequestException(long id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new BadRequestException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
     }
 
     public User save(UserPostRequestBody userPostRequestBody) {
