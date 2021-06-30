@@ -3,6 +3,7 @@
 ### This is a sample of my knowledge about Java API with Spring Boot.
 
 I'm using:
+ * API Client with Exchange _GET/POST/PUT/DELETE_ Http Verbs
  * Pagination
  * Custom Exception Handling
  * Spring Validation
