@@ -1,6 +1,7 @@
 package io.vlaskz.portfolio.repository;
 
 import io.vlaskz.portfolio.model.User;
+import io.vlaskz.portfolio.util.UserCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class UserRepositoryTest {
     @DisplayName("Saves User when successful")
     void savePersistUserWhenSuccessful() {
 
-        User user = createUser();
+        User user = UserCreator.createUserToBeSaved();
 
         User savedUser = this.userRepository.save(user);
 
@@ -38,7 +39,7 @@ class UserRepositoryTest {
     @DisplayName("Update User when successful")
     void saveUpdateUserWhenSuccessful() {
 
-        User user = createUser();
+        User user = UserCreator.createUserToBeSaved();
 
         User savedUser = this.userRepository.save(user);
 
@@ -59,7 +60,7 @@ class UserRepositoryTest {
     @DisplayName("Delete User when successful")
     void saveDeleteUserWhenSuccessful() {
 
-        User user = createUser();
+        User user = UserCreator.createUserToBeSaved();
 
         User savedUser = this.userRepository.save(user);
 
@@ -75,7 +76,7 @@ class UserRepositoryTest {
     @DisplayName("Returns List<User> when successful")
     void findByNameUserWhenSuccessful() {
 
-        User user = createUser();
+        User user = UserCreator.createUserToBeSaved();
 
         User savedUser = this.userRepository.save(user);
 
@@ -118,10 +119,5 @@ class UserRepositoryTest {
     }
 
 
-    private User createUser() {
-        return User.builder()
-                .name("Skyrim Velasquez")
-                .email("fusrodah@icloud.com")
-                .build();
-    }
+
 }
