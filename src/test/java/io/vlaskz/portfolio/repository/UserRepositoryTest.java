@@ -95,7 +95,7 @@ class UserRepositoryTest {
 
         List<User> users = this.userRepository.findByName("no user included.");
 
-        Assertions.assertThat(users).isEmpty(cccccc);
+        Assertions.assertThat(users).isEmpty();
 
 
 
