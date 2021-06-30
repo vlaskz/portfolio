@@ -49,6 +49,23 @@ class UserControllerTest {
                 .getName())
                 .isNotNull()
                 .isEqualTo(expectedName);
+
+    }
+
+
+    @Test
+    @DisplayName("ListAll return list of Users inside page when successful")
+    void listAll_ReturnsListOfUsersInsidePageObjectWhenSuccessful() {
+        String expectedName = UserCreator.createValidUser().getName();
+
+        List<User> userList = userController.list().getBody();
+
+        Assertions.assertThat(userList)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1);
+
+
     }
 
 }
