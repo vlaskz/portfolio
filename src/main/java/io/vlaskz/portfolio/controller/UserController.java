@@ -52,12 +52,12 @@ public class UserController {
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.delete(id), HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<>(userService.delete(id), HttpStatus.NO_CONTENT);
     }
 
     @PutMapping
     public ResponseEntity<String> replace(@RequestBody UserPutRequestBody userPutRequestBody) {
-        return new ResponseEntity<>(userService.replace(userPutRequestBody), HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<>(userService.replace(userPutRequestBody), HttpStatus.NO_CONTENT);
     }
 
 }
