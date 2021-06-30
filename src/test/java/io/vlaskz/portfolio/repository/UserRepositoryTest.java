@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,8 +83,9 @@ class UserRepositoryTest {
 
         List<User> users = this.userRepository.findByName(savedUser.getName());
 
-        Assertions.assertThat(users).isNotEmpty();
-        Assertions.assertThat(users).contains(savedUser);
+        Assertions.assertThat(users)
+                .isNotEmpty()
+                .contains(savedUser);
 
 
     }
@@ -98,10 +100,25 @@ class UserRepositoryTest {
         Assertions.assertThat(users).isEmpty();
 
 
+    }
+
+
+    @Test
+    @DisplayName("Throw ConstraintViolationException when name is empty")
+    void saveThrowConstraintViolationExceptionWhenUserNameIsEmpty() {
+
+        User user = new User();
+//
+//        Assertions.assertThatThrownBy(() -> this.userRepository.save(user))
+//                .isInstanceOf(ConstraintViolationException.class);
+
+        Assertions.assertThatExceptionOfType(ConstraintViolationException.class)
+                .isThrownBy(() -> this.userRepository.save(user));
 
     }
 
-    private User createUser(){
+
+    private User createUser() {
         return User.builder()
                 .name("Skyrim Velasquez")
                 .email("fusrodah@icloud.com")
