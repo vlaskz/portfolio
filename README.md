@@ -22,7 +22,7 @@ I'm using:
 * MySQL Containerization with Docker
 * Build with Maven
  
- _All API's are Restful and level 1 in Richardson Maturity Model. I'll implement levels 2 and 3 in some time._
+ _All API's are Restful and level 2 in Richardson Maturity Model. I'll implement levels 2 and 3 in some time._
  
  
  
