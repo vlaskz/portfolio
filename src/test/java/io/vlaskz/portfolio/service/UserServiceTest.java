@@ -1,9 +1,10 @@
-package io.vlaskz.portfolio.controller;
+package io.vlaskz.portfolio.service;
 
+import io.vlaskz.portfolio.controller.UserController;
 import io.vlaskz.portfolio.model.User;
+import io.vlaskz.portfolio.repository.UserRepository;
 import io.vlaskz.portfolio.request.UserPostRequestBody;
 import io.vlaskz.portfolio.request.UserPutRequestBody;
-import io.vlaskz.portfolio.service.UserService;
 import io.vlaskz.portfolio.util.UserCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,43 +17,42 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
-class UserControllerTest {
+class UserServiceTest {
 
     @InjectMocks
-    private UserController userController;
+    private UserService userService;
 
     @Mock
-    private UserService userServiceMock;
+    private UserRepository userRepositoryMock;
 
     @BeforeEach
     void setup() {
         PageImpl<User> userPage = new PageImpl<>(List.of(UserCreator.createValidUser()));
-        BDDMockito.when(userServiceMock.findAll(ArgumentMatchers.any()))
+        BDDMockito.when(userRepositoryMock.findAll(ArgumentMatchers.any(PageRequest.class)))
                 .thenReturn(userPage);
 
-        BDDMockito.when(userServiceMock.listAll())
+        BDDMockito.when(userRepositoryMock.findAll())
                 .thenReturn(List.of(UserCreator.createValidUser()));
 
-        BDDMockito.when(userServiceMock.findByIdOrThrowBadRequestException(ArgumentMatchers.anyLong()))
-                .thenReturn(UserCreator.createValidUser());
+        BDDMockito.when(userRepositoryMock.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(UserCreator.createValidUser()));
 
-        BDDMockito.when(userServiceMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(userRepositoryMock.findByName(ArgumentMatchers.anyString()))
                 .thenReturn(List.of(UserCreator.createValidUser()));
 
-        BDDMockito.when(userServiceMock.save(ArgumentMatchers.any(UserPostRequestBody.class)))
+        BDDMockito.when(userRepositoryMock.save(ArgumentMatchers.any(User.class)))
                 .thenReturn(UserCreator.createValidUser());
 
-        BDDMockito.when(userServiceMock.delete(ArgumentMatchers.anyLong()))
-                .thenReturn("User has been dropped.");
+        BDDMockito.doNothing().when(userRepositoryMock).delete(ArgumentMatchers.any(User.class));
 
-        BDDMockito.when(userServiceMock.replace(ArgumentMatchers.any(UserPutRequestBody.class)))
-                .thenReturn("User has been replaced");
 
     }
 
@@ -60,17 +60,13 @@ class UserControllerTest {
     @Test
     @DisplayName("List return list of Users inside page when successful")
     void list_ReturnsListOfUsersInsidePageObjectWhenSuccessful() {
-        String expectedName = UserCreator.createValidUser().getName();
 
-        Page<User> userPage = userController.list(null).getBody();
+        List<User> userList = userService.listAll();
 
-        Assertions.assertThat(userPage).isNotNull();
-        Assertions.assertThat(userPage.toList()).isNotEmpty();
-        Assertions.assertThat(userPage.toList()
-                .get(0)
-                .getName())
-                .isNotNull()
-                .isEqualTo(expectedName);
+        Assertions.assertThat(userList).isNotNull();
+        Assertions.assertThat(userList).isNotEmpty();
+        Assertions.assertThat(userList.get(0).getName()).isNotBlank();
+
 
     }
 
@@ -78,8 +74,8 @@ class UserControllerTest {
     @Test
     @DisplayName("ListAll return list of Users inside page when successful")
     void listAll_ReturnsListOfUsersInsidePageObjectWhenSuccessful() {
-        String expectedName = UserCreator.createValidUser().getName();
-        List<User> userList = userController.listAll().getBody();
+
+        List<User> userList = userService.listAll();
 
 
         Assertions.assertThat(userList)
@@ -95,7 +91,7 @@ class UserControllerTest {
     void findById_ReturnsUserWhenSuccessful() {
         Long userId = UserCreator.createValidUser().getId();
 
-        User user = userController.findUserById(userId).getBody();
+        User user = userService.findByIdOrThrowBadRequestException(userId);
         Assertions.assertThat(user).isNotNull();
         Assertions.assertThat(user.getId()).isEqualTo(userId);
 
@@ -106,7 +102,7 @@ class UserControllerTest {
     @DisplayName("FindByName returns a list of Users  when successful")
     void findByName_ReturnsListOfUsersWhenSuccessful() {
 
-        List<User> userList = userController.findUserByName("name").getBody();
+        List<User> userList = userService.findByName("name");
 
         Assertions.assertThat(userList).isNotNull();
         Assertions.assertThat(userList).isNotEmpty();
@@ -122,10 +118,10 @@ class UserControllerTest {
     void findByName_ReturnsEmptyListWhenUserIsNotFound() {
 
 
-        BDDMockito.when(userServiceMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(userRepositoryMock.findByName(ArgumentMatchers.anyString()))
                 .thenReturn(Collections.emptyList());
 
-        List<User> userList = userController.findUserByName("name").getBody();
+        List<User> userList = userService.findByName("name");
         Assertions.assertThat(userList)
                 .isNotNull()
                 .isEmpty();
@@ -135,7 +131,7 @@ class UserControllerTest {
     @DisplayName("Save returns a User when successful")
     void save_ReturnsUserWhenSuccessful() {
 
-        User user = userController.save(new UserPostRequestBody()).getBody();
+        User user = userService.save(new UserPostRequestBody());
 
         Assertions.assertThat(user)
                 .isNotNull();
@@ -145,7 +141,7 @@ class UserControllerTest {
     @DisplayName("Delete returns a String when successful")
     void delete_ReturnsAStringWhenSuccessful() {
 
-        String msg = userController.delete(1L).getBody();
+        String msg = userService.delete(1L);
 
         Assertions.assertThat(msg)
                 .isNotNull()
@@ -156,10 +152,15 @@ class UserControllerTest {
     @Test
     @DisplayName("Replace returns a String when successful")
     void replace_ReturnsAStringWhenSuccessful() {
-        UserPutRequestBody user = new UserPutRequestBody();
-        user.setName("KhalDrogo Velasquez");
-        user.setEmail("drogon@icloud.com");
-        String msg = userController.replace(user).getBody();
+
+        BDDMockito.when(userRepositoryMock.save(ArgumentMatchers.any(User.class)))
+                .thenReturn(UserCreator.createValidUser());
+
+        UserPutRequestBody userPutRequestBody = new UserPutRequestBody();
+        userPutRequestBody.setName("KhalDrogo Velasquez");
+        userPutRequestBody.setEmail("drogon@icloud.com");
+        userPutRequestBody.setId(1L);
+        String msg = userService.replace(userPutRequestBody);
 
         Assertions.assertThat(msg)
                 .isNotNull()
