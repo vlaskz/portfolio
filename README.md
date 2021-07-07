@@ -12,6 +12,8 @@ I'm using:
 * Custom Exception Handling
 * Spring Validation
 * Spring Security
+    * Method Security
+    * Roles Division for Admin and User profiles
 * Spring Boot
 * Spring Data
 * Spring JPA
