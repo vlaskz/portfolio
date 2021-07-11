@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,13 @@ public class UserController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findByIdOrThrowBadRequestException(id));
+    }
+
+    @GetMapping(path = "by-id/{id}")
+    public ResponseEntity<User> findUserByIdAuthenticationPrincipal(@PathVariable Long id,
+                                                                    @AuthenticationPrincipal UserDetails userDetails) {
+        log.info(userDetails);
         return ResponseEntity.ok(userService.findByIdOrThrowBadRequestException(id));
     }
 
