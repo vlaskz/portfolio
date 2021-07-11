@@ -61,7 +61,7 @@ public class UserController {
         return new ResponseEntity<>(userService.save(userPostRequestBody), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/admin/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         return new ResponseEntity<>(userService.delete(id), HttpStatus.NO_CONTENT);
     }
