@@ -1,6 +1,8 @@
 package io.vlaskz.portfolio.integration;
 
+import io.vlaskz.portfolio.model.SysUser;
 import io.vlaskz.portfolio.model.User;
+import io.vlaskz.portfolio.repository.SysUserRepository;
 import io.vlaskz.portfolio.repository.UserRepository;
 import io.vlaskz.portfolio.util.UserCreator;
 import io.vlaskz.portfolio.wrapper.PageableResponse;
@@ -8,10 +10,15 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -26,26 +33,48 @@ import java.util.List;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerIT {
     @Autowired
+    SysUserRepository sysUserRepository;
+    @Autowired
+    @Qualifier(value = "testRestTemplateRoleUser")
     private TestRestTemplate testRestTemplate;
     @Autowired
     private UserRepository userRepository;
-    @LocalServerPort
-    private Integer port;
 
+    private static final SysUser ADMIN = SysUser.builder()
+            .name("Sam Velasquez")
+            .email("vlaskz@icloud.com")
+            .password("{bcrypt}$2a$10$K1l5qFt3yawP44o4VzH4IOTrICLc8gXcB1hcOXYhHjZ57Z0fOTSwW")
+            .username("vlaskz")
+            .authorities("ROLE_USER, ROLE_ADMIN")
+            .build();
+
+    @TestConfiguration
+    @Lazy
+    static class Config {
+        @Bean(name = "testRestTemplateRoleUser")
+        public TestRestTemplate testRestTemplateRoleUserCreator(@Value("${local.server.port}") int port) {
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder()
+                    .rootUri("http://localhost:"+port)
+                    .basicAuthentication("vlaskz", "striper");
+
+            return new TestRestTemplate(restTemplateBuilder);
+        }
+
+    }
 
     @Test
     @DisplayName("List return list of Users inside page when successful")
     void list_ReturnsListOfUsersInsidePageObjectWhenSuccessful() {
         User savedUser = userRepository.save(UserCreator.createUserToBeSaved());
 
-        String expectedName = savedUser.getName();
+        sysUserRepository.save(ADMIN);
 
+        String expectedName = savedUser.getName();
 
         PageableResponse<User> userPage = testRestTemplate.exchange("/users", HttpMethod.GET, null,
                 new ParameterizedTypeReference<PageableResponse
                         <User>>() {
                 }).getBody();
-
 
         Assertions.assertThat(userPage).isNotNull();
         Assertions.assertThat(userPage.toList())
@@ -59,16 +88,17 @@ class UserControllerIT {
 
     }
 
-
     @Test
     @DisplayName("ListAll return list of Users inside page when successful")
     void listAll_ReturnsListOfUsersInsidePageObjectWhenSuccessful() {
         User savedUser = userRepository.save(UserCreator.createUserToBeSaved());
 
+        sysUserRepository.save(ADMIN);
+
         String expectedName = savedUser.getName();
 
 
-        List<User> userList = testRestTemplate.exchange("/users/all", HttpMethod.GET, null,
+        List<User> userList = testRestTemplate.exchange("/users/admin/all", HttpMethod.GET, null,
                 new ParameterizedTypeReference<List
                         <User>>() {
                 }).getBody();
@@ -98,7 +128,6 @@ class UserControllerIT {
 
     }
 
-
     @Test
     @DisplayName("FindByName returns a list of Users  when successful")
     void findByName_ReturnsListOfUsersWhenSuccessful() {
@@ -118,7 +147,6 @@ class UserControllerIT {
                 .isNotNull();
 
     }
-
 
     @Test
     @DisplayName("FindByName returns empty list when User's not found")
@@ -174,5 +202,7 @@ class UserControllerIT {
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
     }
+
+
 
 }
